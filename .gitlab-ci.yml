@@ -6,6 +6,9 @@ stages:
   - sast
   - dependency
   - docker
+  - review
+  - deploy
+  - dast
 
 build:
   stage: build
@@ -63,3 +66,31 @@ docker_build:
     DOCKER_TLS_CERTDIR: ""
   script:
     - docker build -t taskmanager .
+
+review:
+  stage: review
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - docker build -t review .
+
+deploy_stage:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - docker compose up -d
+
+zap_scan:
+  stage: dast
+  image: ghcr.io/zaproxy/zaproxy:stable
+  script:
+    - zap-baseline.py -t http://stage:5000
