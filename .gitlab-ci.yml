@@ -1,0 +1,65 @@
+stages:
+  - build
+  - unit
+  - integration
+  - functional
+  - sast
+  - dependency
+  - docker
+
+build:
+  stage: build
+  image: python:3.11
+  script:
+    - python --version
+    - pip install -r requirements.txt
+    - pip list
+
+unit_test:
+ stage: unit
+ image: python:3.11
+
+ script:
+  - pytest tests/unit
+
+integration_test:
+ stage: integration
+ image: python:3.11
+
+ script:
+  - pytest tests/integration
+
+functional_test:
+ stage: functional
+
+ script:
+  - pytest tests/functional
+
+sast_scan:
+  stage: sast
+  image: python:3.11
+  script:
+    - pip install bandit
+    - bandit -r .
+
+dependency_check:
+  stage: dependency
+  image:
+    name: owasp/dependency-check:latest
+    entrypoint: [""]
+  script:
+    - /usr/share/dependency-check/bin/dependency-check.sh --scan . --format HTML --out reports
+  artifacts:
+    paths:
+      - reports/
+
+docker_build:
+  stage: docker
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - docker build -t taskmanager .
