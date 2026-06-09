@@ -33,10 +33,10 @@ integration_test:
   - pytest tests/integration
 
 functional_test:
- stage: functional
-
- script:
-  - pytest tests/functional
+  stage: functional
+  image: python:3.11
+  script:
+    - pytest tests/functional
 
 sast_scan:
   stage: sast
@@ -93,4 +93,4 @@ zap_scan:
   stage: dast
   image: ghcr.io/zaproxy/zaproxy:stable
   script:
-    - zap-baseline.py -t http://stage:5000
+    - zap-baseline.py -t http://host.docker.internal:5000
