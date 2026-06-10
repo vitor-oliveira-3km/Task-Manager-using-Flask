@@ -19,22 +19,35 @@ build:
     - pip list
 
 unit_test:
- stage: unit
- image: python:3.11
+  stage: unit
+  image: python:3.11
 
- script:
-  - pytest tests/unit
+  before_script:
+    - pip install -r requirements.txt
+    - pip install pytest
+
+  script:
+    - pytest tests/unit
 
 integration_test:
- stage: integration
- image: python:3.11
+  stage: integration
+  image: python:3.11
 
- script:
-  - pytest tests/integration
+  before_script:
+    - pip install -r requirements.txt
+    - pip install pytest
+
+  script:
+    - pytest tests/integration
 
 functional_test:
   stage: functional
   image: python:3.11
+
+  before_script:
+    - pip install -r requirements.txt
+    - pip install pytest
+
   script:
     - pytest tests/functional
 
